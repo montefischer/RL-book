@@ -1,0 +1,105 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\title{Assignment 6}
+\author{Monte Fischer}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problem 1}
+
+
+With a utility function $U(x) = x - \frac{\alpha}{2} x^2$ and $x \sim \mathcal{N}(\mu, \sigma^2)$ we calculate as follows:
+
+\begin{equation}
+    \mathbb{E}[U(x)] = \mathbb{E}[x - \frac{\alpha}{2} x^2] = \mathbb{E}[x] - \frac{\alpha}{2} \mathbb{E}[x^2] = \mu - \frac{\alpha}{2}(\mu^2 + \sigma^2)
+\end{equation}
+
+If $x_{CE} = U^{-1}(\mathbb{E}[U(x)])$ then using standard variance identities,
+
+\begin{equation}
+    U(x_{CE}) = x_{CE} - \frac{\alpha}{2} x_{CE}^2 = \mu - \frac{\alpha}{2} (\mu^2 + \sigma^2)
+\end{equation}
+thus
+\begin{equation}
+    0 = \frac{\alpha}{2} x_{CE}^2 - x_{CE} + \mu - \frac{\alpha}{2} (\mu^2 + \sigma^2)
+\end{equation}
+hence
+\begin{equation}
+    x_{CE} = \frac{1}{\alpha} \left(1 \pm \sqrt{1 - \alpha(2\mu - \alpha(\mu^2 + \sigma^2))}\right)
+\end{equation}
+thus
+\begin{equation}
+    \pi_A := \mathbb{E}[x] - x_{CE} = \mu - \frac{\alpha}{2}(\mu^2 + \sigma^2) - \frac{1}{\alpha} \left(1 \pm \sqrt{1 - \alpha(2\mu - \alpha(\mu^2 + \sigma^2))}\right).
+\end{equation}
+
+I use an equivalent formulation of the investment scenerio where $z$ is the fraction of wealth invested in the risky asset and units are such that 1 is the total amount to be invested.
+In this investment scenario, we wish to compute $\argmax_{z\in[0,1]} \mathbb{E}[U(zx + (1-z)r)]$ where $x \sim \mathcal{N}$ and $r \in \mathbb{R}_{>0}$ is a constant. 
+
+Expanding $U(zx+(1-z)r$, we get with a little algebra that the above is equivalent to
+\begin{equation}
+    \argmax_{z\in[0, 1]} \left( \frac{\alpha}{2} (\mu^2 + \sigma^2) - \alpha r \mu + \mu^2 + \sigma^2 \right) z^2 + (\mu - r + \alpha r\mu - 2(\mu^2 + \sigma^2))z + (r + \mu^2 + \sigma^2)
+\end{equation}
+which is an elementary constrained optimization problem depending on $\mu, \sigma^2, r, \alpha$.
+
+For problem instances with $\mu=0, \sigma^2=1, r=1$, we can compute the optimal investment fraction $z$ as a function of $a$. We restrict to $\alpha >= 0$ so the utility function is concave. Setting the coefficients as above, the problem reduces to
+\begin{equation}
+    \argmax_{z \in [0,1]} \left(1-\frac{\alpha}{2}\right) z^2 -3z + 2
+\end{equation}
+The expression inside the maximum attains the value $2$ when $z=0$ and $\frac{\alpha}{2}$ when $z=1$, and attains a local maximum at $z=\frac{3}{2-\alpha}$. However, the constraint that $z \in [0, 1]$ means that the local maximum is never attained inside the feasible region, hence $z=0$ is the argument maximum. Interpretation: never invest in the risky asset if its returns follow a standard normal!
+
+\section*{Problem 3}
+
+With notation as in the problem description,
+\begin{equation*}
+    W = \left\{
+        \begin{array}{ll}
+            W_0(1 + \alpha f) \quad \text{w.p. } p\\
+            W_0(1 - \beta f) \quad \text{w.p. } 1-p\\
+        \end{array}
+        \right.
+\end{equation*}
+and so
+\begin{equation*}
+    U(W) = \left\{
+        \begin{array}{ll}
+            \log W_0 + \log(1 + \alpha f) \quad \text{w.p. } p\\
+            \log W_0 + \log(1 - \beta f) \quad \text{w.p. } 1-p\\
+        \end{array}
+        \right.
+\end{equation*}
+hence
+\begin{align}
+    \mathbb{E}[U(W)] &= p(\log W_0 + \log(1+\alpha f)) + (1-p)(\log W_0 + \log(1-\beta f))\\
+    &= \log W_0 + p\log(1+\alpha f) + (1-p)\log(1-\beta f).
+\end{align}
+From this expression we can take derivatives:
+\begin{equation}
+    \frac{d\mathbb{E}U(W)}{df} = \frac{p\alpha}{1+\alpha f} - \frac{(1-p)\beta}{1-\beta f} 
+\end{equation}
+\begin{equation}
+    \frac{d^2 \mathbb{E}U(W)}{df^2} = \frac{-p\alpha^2}{(1+\alpha f)^2} + \frac{-(1-p)^2\beta^2}{(1-\beta f)^2} < 0.
+\end{equation}
+From the second derivative, we see that the utility function of wealth is concave and so we can solve directly for the maximum by setting the first order derivative to 0:
+\begin{equation}
+    0 = \frac{p\alpha}{1+\alpha f^*} - \frac{(1-p)\beta}{1-\beta f^*} 
+\end{equation}
+which yields, with a little algebra,
+\begin{equation}
+    f^* = \frac{p}{\beta} - \frac{1-p}{\alpha}.
+\end{equation}
+This is intuitive: the higher our edge of gain relative to the loss of what we wager, the higher the resultant fraction of wealth should be bet. For $\alpha = \beta = 1$ we have $f^* = 2\left(p-\frac{1}{2}\right)$ as in the simplified Kelly betting problem.
+
+Note that the optimal fraction only makes sense in the context of the problem when $p \geq \frac{\beta}{\alpha+\beta}$. If this condition fails to be satisfied, this means that the ``optimal'' bet is negative, so the game shouldn't be played at all ($f = 0$)..
+
+
+\end{document}
