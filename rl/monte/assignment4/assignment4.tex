@@ -1,0 +1,72 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\title{Assignment 4}
+\author{Monte Fischer}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problem 1}
+We initialize $V_0(s_1) = 10, V_0(s_2) = 1, V_0(s_3) = 0$. Then we compute $V_1$ according to the Bellman Optimality Operator $B^*$:
+\begin{align*}
+    V_1(s_1) = B^*(V_0)(s_1) = \max_a q_0(s_1, a) &= \max_a \{R(s_1, a) + \gamma \sum_{s^\prime \in \mathcal{S}} P(s_1,a,s^\prime)V_0(s^\prime)\}\\
+    &= \max\{8+0.2\cdot10+0.6\cdot1+0.2\cdot0,10+0.1\cdot10+0.2\cdot1+0.7\cdot0\}\\
+    &=\max\{10.6,11.2\} = 11.2\\
+    V_1(s_2) = B^*(V_0)(s_2) = \max_a q_0(s_2, a) &= \max_a  \{R(s_2, a) + \gamma \sum_{s^\prime \in \mathcal{S}} P(s_2,a,s^\prime)V_0(s^\prime)\}\\
+    &= \max\{1+0.3\cdot10+0.3\cdot1+0.4\cdot0,-1+0.5\cdot10+0.3\cdot1+0.2\cdot0\}\\
+    &=\max\{4.3,4.3\}=4.3\\
+\end{align*}
+Similarly, it is easy to see that $V_1(s_3)=0$. To compute $V_2$ we apply $B^*$ to $V_1$.
+
+\begin{align*}
+    V_2(s_1) = B^*(V_1)(s_1) = \max_a q_1(s_1, a) &= \max_a \{R(s_1, a) + \gamma \sum_{s^\prime \in \mathcal{S}} P(s_1,a,s^\prime)V_1(s^\prime)\}\\
+    &= \max\{8+0.2\cdot11.2+0.6\cdot4.3+.2\cdot0,10+0.1\cdot11.2+0.2\cdot4.3+0.7\cdot0\}\\
+    &= \max\{12.82,11.98\} = 12.82\\
+    V_2(s_2) = B^*(V_1)(s_2) = \max_a q_1(s_2, a) &= \max_a  \{R(s_2, a) + \gamma \sum_{s^\prime \in \mathcal{S}} P(s_2,a,s^\prime)V_1(s^\prime)\}\\
+    &= \max\{1+0.3\cdot11.2+0.3\cdot4.3+0.4\cdot0,-1+0.5\cdot11.2+0.3\cdot4.3+0.2\cdot0\}\\
+    &= \max\{5.65,5.89\} = 5.89
+\end{align*}
+
+By paying attention to the index of the largest argument in the $\max_a$ above, we can immediately recover that $\pi_1(s_1)=G(V_1)(s_1)=\argmax_a\{R(s_1,a)+\sum_{a^\prime}P(s,a,s^\prime)V_1(s^\prime)\}=a_1$ and similarly that $\pi_1(s_2)=G(V_1)(s_2)=a_2$. 
+We determine $\pi_2(s_1)=G(V_2)(s_1) = \argmax_a \{q_2(s_1,a)\}$ by computing $\max\{8+0.2\cdot12.82+0.6\cdot5.89+0.2\cdot0, 10+0.1\cdot12.82+0.2\cdot4.3+0.7\cdot0\} = \max\{14.098, 12.142\} = 14.098$ hence $\pi_2(s_1)=a_1$. Likewise $\pi_2(s_2)=G(V_2)(s_2) = \argmax_a \{q_2(s_2,a)\} = a_2$ since $\max\{1+0.3\cdot12.82+0.3\cdot5.89+0.4\cdot0, -1+0.5\cdot12.82+0.3\cdot4.3+0.2\cdot0\} = \max\{6.613, 6.7\} = 6.7$.
+
+Looking at the linear combination that is used to calculate $q_i(s,a)$, we infer that the term associated with $a_1$ will grow faster than the term associated with $a_2$ for $s_1$, and vice versa for $s_2$. So the optimal policy is indeed $\pi^*(s_1)=a_1, \pi^*(s_2)=a_2$
+
+\section*{Problem 4}
+
+See the file \texttt{simple\_two\_store\_inventory\_mdp\_cap.py} in directory \texttt{assignment4} for the implementation.
+
+In my code, I represent state as a 4-tuple $(H_1, O_1, H_2, O_2)$ of on-hand ($H_i$) and on-order ($O_i$) inventory for stores 1 and 2 ($i=1,2$). Each action takes the form $(A_1, A_2, T)$ where $A_i$ represents the inventory ordered to store $i$ and $T$ denotes the net inventory transferred from store 2 to store 1. Letting $C_i$ denote the capacity for store $i$, we have the following constraints:
+
+\begin{align}
+    H_1 + O_1 + A_1 + T &\leq C_1\\
+    H_2 + O_2 + A_2 - T &\leq C_2
+\end{align}
+
+which accounts for the logic of the \texttt{get\_action\_transition\_reward\_map} method of the implemented class \texttt{SimpleTwoStoreInventoryMDPCap}.
+
+Something I noticed and am unsure about is the calculation on page 85 of the class book. In general I do not see why we have the equality 
+\[ \sum_j=k^\infty j \cdot f(j) = \lambda(1 - F(j-2))\]
+where $f, F$ are the pmf and cdf of a $Pois(\lambda)$ distribution respectively, since \[1 - F(x) = \sum_{j=x+1}^{\infty} f(j) \neq \sum_{j=x+1}^{\infty} j f(j)\] in general. This would mean that the calculation of the rewards are wrong. Have I misunderstood, or is this criticism legitimate?
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
