@@ -54,10 +54,6 @@ In my code, I represent state as a 4-tuple $(H_1, O_1, H_2, O_2)$ of on-hand ($H
 
 which accounts for the logic of the \texttt{get\_action\_transition\_reward\_map} method of the implemented class \texttt{SimpleTwoStoreInventoryMDPCap}.
 
-Something I noticed and am unsure about is the calculation on page 85 of the class book. In general I do not see why we have the equality 
-\[ \sum_j=k^\infty j \cdot f(j) = \lambda(1 - F(j-2))\]
-where $f, F$ are the pmf and cdf of a $Pois(\lambda)$ distribution respectively, since \[1 - F(x) = \sum_{j=x+1}^{\infty} f(j) \neq \sum_{j=x+1}^{\infty} j f(j)\] in general. This would mean that the calculation of the rewards are wrong. Have I misunderstood, or is this criticism legitimate?
-
 \end{document}
 
 
