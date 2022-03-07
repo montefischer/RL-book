@@ -1,0 +1,39 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\title{Assignment 7}
+\author{Monte Fischer}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problem 1}
+
+From the textbook, we know that the Merton problem setup leads to
+\begin{equation}
+    \log W_1 \sim \mathcal{N} \left( r+\pi(\mu-r)-\frac{\pi^2 \sigma^2}{2}, \pi^2 \sigma^2  \right)
+\end{equation}
+and we wish to maximize $$\mathbb{E}[U(W_1)] = \mathbb{E}[\log W_1] = r+\pi(\mu-r)-\frac{\pi^2 \sigma^2}{2}$$. 
+But this expression is a concave quadratic in $\pi$, so it is maximized at $$\pi^* = \frac{\mu-r}{\sigma^2}.$$ 
+
+\section*{Problem 3}
+The state space for the basic learning/working MDP is $\{0,1\}\times\mathbb{R}_{\>0}$, where the first index is a binary variable equal to 1 if the agent is employed and 0 otherwise, and the second index measures the agent's skill level $s$. When in a state $(1,s)$, the action space is $\alpha\in[0,1]$, but when in a state $(0,s)$, the action space is trivial (i.e. there is only a single action available and thus there is nothing the agent can do to influence transition probabilities). The reward for choosing action $\alpha$ from state $(1,s)$ is $\alpha f(s)$, and 0 for choosing the trivial action from state $(0, s)$. Finally, the transition function is as such:
+\begin{align*}
+    P(\{1, s\}, \alpha, \{1, s(1+(1-\alpha)g(s))) &= 1-p\\
+    P(\{1, s\}, \alpha, \{0, s(1+(1-\alpha)g(s))) &= p\\
+    P(\{0, s\}, e, \{1, s e^{-\log{2}/\lambda} \}) &= 1-h(s)\\
+    P(\{0, s\}, e, \{0, s e^{-\log{2}/\lambda} \}) &= h(s)
+\end{align*}
+
+When considering an optimal policy, much depends on the functions $f$ and $g$ and the agent's utility function $U$. If all functions are linear in $s$, I suspect that there is a deterministic optimal policy $\pi_D^* = \alpha^*$ irrespective of the agent's current skill level. If $f, g,$ or $U$ are concave and the game is finite-horizon, my intuition is that the optimal policy will allocate more weight towards learning initially, and then shift to working more as we observe diminishing rewards to skill improvement. In the infinite horizon version, I suspect that studying will be very heavily favored over working because the possibility of getting ``stuck'' in unemployment with exponentially diminishing skills is disastrous when the alternative is unboundedly increasing earnings.
+
+
+\end{document}
