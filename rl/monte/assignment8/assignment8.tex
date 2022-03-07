@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\title{Assignment 8}
+\author{Monte Fischer}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problem 1}
+
+It is most convenient to represent the state as the bank's books after all deposits, withdrawals, and regulatory fees have been paid, and after price movement of the risky asset, but before the day's borrowing and investment actions have been taken. Denote the end-of-day three--tuple of cash-on-hand, amount invested in the risky asset, and amount borrowed due to be repaid by $(c_t, s_t, b_t)$. The state space is thus $\mathbb{R}_{\geq 0}\times\mathbb{R}_{\geq 0}\times \mathbb{R}_{\geq 0}$.
+
+An action consists of the amount to be borrowed for the next day and the net change in investment, both denominated in dollars: $(a_t, \Delta_t)$. The action space for state $(c_t, s_t, b_t)$ is subject to the following constraints derived from the modeling assumptions:
+
+\begin{align}
+    c_t + a_t - \Delta_t - b_t(1+R) &\geq \min \left\{C, K \cot \frac{\pi c_t}{2C} \right\} \\
+    s_t + \Delta_t &\geq 0\\
+    a_t &\geq 0.
+\end{align}
+
+To give the distribution of state $S_{t+1}$ given state $S_t=(c_t, s_t, b_t)$ and action $(a_t, \Delta_t)$ it is necessary to make some assumptions about the depositing and withdrawal processes and the behavior of the risky asset.
+
+We assume that the logarithm of the change in price of the risky asset from one day to the next is modeled by $z \sim \mathcal{\kappa, \tau^2}$ so that
+\begin{equation}
+    s_{t+1} \sim s_t e^{z}.
+\end{equation}
+
+To account for withdrawal and depositing behavior, we will use the two assumptions: (1) all deposits are made before any withdrawals; ($2^\prime$) if a withdrawal would exhaust all remaining cash, the customer is given as much money as the bank has on hand, and told to come back the next day for the remaining amount. Assuming $2^\prime$ simplifies the modeling below and is not too unrealistic if withdrawals are thin--tailed. However, if withdrawals were heavy--tailed, the assumption is less appropriate because withdrawals far in the tail would ordinarily be turned down instead of exhausting all available cash.
+
+We assume that deposits follow a compound Poisson process with rate $\lambda_d$ and deposit sizes $X_i \sim F$ i.i.d, where $F$ is a nonnegative distribution function with finite mean $\mu_d$ and finite variance $\sigma_d^2$. Likewise, we assume that withdrawals follow a compound Poisson process with rate $\lambda_w$ and deposit sizes $Y_i \sim F$ i.i.d, where $F$ is a nonnegative distribution function with finite mean $\mu_w$ and finite variance $\sigma_w^2$. Thus
+\begin{align}
+    W_t &\sim \sum_{i=1}^{N_{\lambda_d}} X_i\\
+    D_t &\sim \sum_{i=1}^{N_{\lambda_w}} Y_i.
+\end{align}
+
+Finally, we note that if $c_t < C$, the regulator will penalize the bank with a fine of $K\cot\frac{\pi c_t}{2C}$. Combining, we have that 
+
+\begin{equation}
+    \tilde{c}_{t+1} \sim \max\{0, c_t + W_t - D_t - K\cot\frac{\pi c_t}{2C} \mathbb{I}_{\{c_t < C\}}\}
+\end{equation}
+and we have thereby specified the transition distribution: 
+\begin{equation}
+    S_{t+1} \sim (\tilde{c}_{t+1} + a_t - b_t(1+R) - d_{t+1}, s_{t+1} + \Delta_t, a_t)
+\end{equation}
+given the state and action specified above.
+
+Given a $T$ day horizon and a utility function $U$, the reward function to be maximized is then $U(c_T + s_T - b_T)$. The state space is continuous, so approximate dynamic programming would be the appropriate solution paradigm (note also that the distribution of $\tilde{c}$ may be complicated and easier to simulate than to derive analytically, depending on $X$ and $Y$).
+
+\section*{Problem 2}
+
+
+
+
+\end{document}
