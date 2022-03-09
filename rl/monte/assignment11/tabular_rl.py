@@ -16,7 +16,7 @@ S = TypeVar('S')
 TabularValueFunctionApprox = Mapping[NonTerminal[S], float]
 
 
-def tabular_update(
+def tabular_mc_update(
         v: TabularValueFunctionApprox,
         counts: Mapping[NonTerminal[S], int],
         steps: Iterable[ReturnStep[S]],
@@ -66,33 +66,41 @@ def tabular_mc_prediction(
     yield f
 
     for episode in episodes:
-        tabular_update(f, counts, episode, lambda n: 1./n)
+        tabular_mc_update(f, counts, episode, lambda n: 1. / n)
         yield f
 
 
 if __name__ == '__main__':
     # compare tabular-specific implementation with standard FunctionApprox
-    from rl.chapter10.random_walk_mrp import RandomWalkMRP
+    from rl.chapter2.simple_inventory_mrp import SimpleInventoryMRPFinite
     from rl.chapter10.prediction_utils import fmrp_episodes_stream
     import rl.iterate as iterate
     from pprint import pprint
-    random_walk: RandomWalkMRP = RandomWalkMRP(
-        barrier=10,
-        p=0.5
+
+    user_capacity = 2
+    user_poisson_lambda = 1.0
+    user_holding_cost = 1.0
+    user_stockout_cost = 10.0
+
+    mrp: SimpleInventoryMRPFinite = SimpleInventoryMRPFinite(
+        capacity=user_capacity,
+        poisson_lambda=user_poisson_lambda,
+        holding_cost=user_holding_cost,
+        stockout_cost=user_stockout_cost
     )
-    num_episodes = 10000
+    num_episodes = 800
     gamma = 0.9
-    episodes: Iterable[Iterable[TransitionStep[int]]] = fmrp_episodes_stream(random_walk)
+    episodes: Iterable[Iterable[TransitionStep[int]]] = fmrp_episodes_stream(mrp)
     mc_vfs: Iterator[TabularValueFunctionApprox] = \
         tabular_mc_prediction(
             traces=episodes,
-            approx_0={s: 0.5 for s in random_walk.non_terminal_states},
+            approx_0={s: 0.5 for s in mrp.non_terminal_states},
             gamma=gamma
         )
     final_mc_vf: TabularValueFunctionApprox = iterate.last(itertools.islice(mc_vfs, num_episodes))
     print(f"Equal-Weights-MC Value Function with {num_episodes:d} episodes")
-    pprint({s: round(final_mc_vf[s], 3) for s in random_walk.non_terminal_states})
+    pprint({s: round(final_mc_vf[s], 3) for s in mrp.non_terminal_states})
     print("True Value Function")
-    random_walk.display_value_function(gamma=gamma)
+    mrp.display_value_function(gamma=gamma)
 
 
