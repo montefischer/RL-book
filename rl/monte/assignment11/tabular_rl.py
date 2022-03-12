@@ -9,7 +9,7 @@ S = TypeVar('S')
 TabularValueFunctionApprox = Mapping[NonTerminal[S], float]
 
 
-def extended_vf(vf: TabularValueFunctionApprox[S], s: State[S]) -> float:
+def extended_vf(vf: TabularValueFunctionApprox[NonTerminal[S]], s: State[S]) -> float:
     return s.on_non_terminal(lambda x: vf[x], 0.0)
 
 
