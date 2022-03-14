@@ -24,3 +24,7 @@ book.tex
 latex/Alon.cls
 latex/epigrafica.sty
 lgrenc.def
+
+# Midterm and final solutions
+/rl/monte/final/
+/rl/monte/midterm/
