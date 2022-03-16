@@ -57,7 +57,23 @@ Given a $T$ day horizon and a utility function $U$, the reward function to be ma
 
 \section*{Problem 2}
 
+With $g(s) = p g_1(s) + hg_2(s)$ where 
+$$ g_1(s) = \int_s^\infty (x - s)f(x)dx $$
+$$ g_2(s) = \int_{-\infty}^s (s - x)f(x)dx$$
+we seek $s$ to minimize the cost. Using the Leibniz integral rule, we see that
+$$ \frac{d g_1(s)}{ds} = \int_s^\infty \frac{\partial}{\partial s} (x-s)f(x) dx = - \int_s^\infty f(x) dx = F(s) - 1$$
+$$\frac{d g_2(s)}{ds} = \int_{-\infty}^s \frac{\partial}{\partial s} (s - x) f(x) dx = \int_{-\infty}^s f(x) dx = F(s)$$
+and thus
+$$ \frac{dg}{ds} = p \frac{dg_1(s)}{ds} + h \frac{dg_2(s)}{ds} = p(F(s) - 1) + h(F(s))$$
+and
+$$\frac{d^2 g}{ds^2} = (p + h) f(s) > 0$$
+so we may set the first derivative to 0 to find the local minimum of cost. When $0 = p (F(s) - 1) + h F(s)$, a little algebra shows
+$$F(s) = \frac{p}{p+h}$$
+so
+$$ s \in F^{-1}\left(\frac{p}{p+h}\right)$$
+and $s$ is unique iff $F$ is 1--to--1 at $p/(p+h)$.
 
+In relation to an options portfolio, we are seeking the optimal strike price $s$ to minimize the cost of a portfolio of $p$ European call options at strike $s$ and $h$ European put options at strike $s$ for an underlying with price distribution $f$ at termination, without any discounting.
 
 
 \end{document}
