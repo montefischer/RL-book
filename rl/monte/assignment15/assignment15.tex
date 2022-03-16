@@ -1,0 +1,33 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand*{\Z}{\makebox[1ex]{\textbf{$\cdot$}}}
+
+\title{Assignment 15}
+\author{Monte Fischer}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problem 1}
+For implementations, see the code in \texttt{monte/assignment15/fixed\_N\_episodes.py}.
+
+\begin{table}[h]
+\begin{tabular}{lllll}
+       & \textbf{Tabular MC} & \textbf{MRP} & \textbf{Tabular TD(0)} & \textbf{LSTD} \\ \hline
+$V(A)$ & 8.375               & 12.933       & 12.914                 & 12.933        \\
+$V(B)$ & 5.267               & 9.600        & 9.597                  & 9.600        
+\end{tabular}
+\end{table}
+
+Apart from small discrepencies owing to convergence, the value function computed by the MRP, Tabular TD(0), and LSTD are approximately equal. Tabular MC is very different. This is not surprising, since MC methods compute the value function as a simple average of the available data, whereas TD--based methods compute the value function of the MRP implied by the available data. The data we have to work with here is extremely limited, so we observe a large discrepancy between the MC computed value function and the value function that the TD methods (and the direct MRP Bellman equation--derived solution) converge on.
+
+\end{document}

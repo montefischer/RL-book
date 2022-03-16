@@ -65,8 +65,6 @@ def get_probability_and_reward_functions(
         prob_scaffold[state][next_state] += 1
         reward_scaffold[state]['sum'] += reward
         reward_scaffold[state]['count'] += 1
-    print("prob scaffold")
-    print(prob_scaffold)
     probfunc: ProbFunc = {s: {t: prob_scaffold[s][t] / sum(prob_scaffold[s][x] for x in prob_scaffold[s])\
                               for t in prob_scaffold[s]} for s in prob_scaffold}
     rewardfunc: RewardFunc = {s: reward_scaffold[s]['sum'] / reward_scaffold[s]['count'] for s in reward_scaffold}
@@ -132,15 +130,18 @@ def get_lstd_value_function(
     A = np.zeros((n, n))
     b = np.zeros(n)
     for state, reward, next_state in srs_samples:
-        if next_state == 'T':
-            continue
+        # since the data we are working with here is so limited,
+        # we will opt for higher runtime complexity in exchange
+        # for simplicity of the code by not using Sherman-Morrison
         vec1, vec2 = np.zeros(n), np.zeros(n)
         vec1[sorted_keys.index(state)] = 1
-        vec2[sorted_keys.index(next_state)] = 1
-        A += vec1.reshape((n, 1)) @ (vec1 - vec2).reshape((1,n))
-        print(A)
+        if next_state != 'T':
+            vec2[sorted_keys.index(next_state)] = 1
+            vec2 = vec1 - vec2
+        else:
+            vec2 = vec1
+        A += np.outer(vec1, vec2)
         b += vec1 * reward
-    print(A)
     opt_weights = np.linalg.inv(A) @ b
     return {state: opt_weights[i] for i, state in enumerate(sorted_keys)}
 
