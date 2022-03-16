@@ -1,0 +1,48 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\newcommand*{\Z}{\makebox[1ex]{\textbf{$\cdot$}}}
+
+\title{Assignment 16}
+\author{Monte Fischer}
+
+\begin{document}
+
+\maketitle
+
+\section*{Problem 3}
+
+With $\phi(s,a), \theta$ as in the problem definition and 
+$$pi(s, a; \theta) = \frac{\exp{\phi(s,a)\cdot\theta}}{\sum_{b\in\mathcal{A}} \exp{\phi(s,b)\cdot\theta}} $$
+we compute the score function as follows:
+\begin{align*}
+    \nabla_\theta \log \pi(s, a;\theta) &= \nabla_\theta(\phi(s,a)\cdot\theta - \log\sum_{b\in\mathcal{A}} \exp{\phi(s,b)\cdot\theta})\\
+    &= \phi(s,a) - \nabla_\theta\log\sum_{b\in\mathcal{A}} \exp{\phi(s,b)\cdot\theta}\\
+    &= \phi(s,a) - \sum_{b\in\mathcal{A}}^{} \frac{\phi(s,b) \exp(\phi(s,b)\cdot\theta)}{\sum_{b\in\mathcal{A}}^{} \exp(\phi(s,b)\cdot\theta)}\\
+    &= \phi(s,a) - \sum_{b\in\mathcal{A}}^{} \pi(s, b; \theta) \phi(s,b)\\
+    &= \phi(s,a) - \mathbb{E}_\pi [\phi(s,\Z)]
+\end{align*}
+
+We wish to choose $Q(s,a;w)$ to satisfy the constraint that $\nabla_w Q(s,a;w) = \nabla_\theta \log\pi(s, a; \theta) = \phi(s, a) - \mathbb{E}_\pi[\phi(s,\Z)]$. If we choose $Q(s,a;w) = \phi(s,a)\cdot w - \mathbb{E}_\pi [\phi(s,\Z)\cdot w]$ then
+\begin{align*}
+    Q(s,a;w) &= (\phi(s,a) - \mathbb{E}_\pi[\phi(s, \Z)])\cdot w\\
+    &= \sum_{i=1}^{m} \frac{\partial \log \pi(s,a;\theta)}{\partial \theta_i} w_i \\
+    &= \nabla_\theta \log\pi(s,a,\theta) \cdot w
+\end{align*}
+as desired. Then immediately we have
+\begin{align*}
+    \mathbb{E}_\pi[Q(s,a;w)] &= \mathbb{E}[\phi(s,a)\cdot w - \mathbb{E}[\phi(s, \Z)\cdot w]]\\
+    &= \mathbb{E}[\phi(s,a)\cdot w] -\mathbb{E}[\phi(s,a)\cdot w]\\
+    &= 0
+\end{align*}
+as desired.
+
+
+\end{document}
