@@ -6,7 +6,7 @@ from rl.markov_process import NonTerminal, State
 from rl.markov_decision_process import FiniteMarkovDecisionProcess, TransitionStep, ReturnStep
 from rl.returns import returns
 from rl.function_approx import learning_rate_schedule
-from rl.policy import Policy, FinitePolicy, FiniteDeterministicPolicy, UniformPolicy, RandomPolicy
+from rl.policy import Policy, FinitePolicy, DeterministicPolicy, UniformPolicy, RandomPolicy
 
 S = TypeVar('S')
 A = TypeVar('A')
@@ -74,10 +74,20 @@ def tabular_sarsa_glie():
     pass
 
 
+def almost_equal_qvf(q1: TabularActionFunctionApprox, q2: TabularActionFunctionApprox) -> bool:
+    distance = 0
+    for s in q1:
+        for a1, a2 in zip(q1[s].keys(), q2[s].keys()):
+            distance += np.abs(q1[s][a1] - q2[s][a2])
+    return distance < 1e-5
+
+
 if __name__ == '__main__':
     # test implementations against SimpleInventoryMDPCap and AssetAllocDiscrete
     from rl.chapter3.simple_inventory_mdp_cap import SimpleInventoryMDPCap, InventoryState
-    from pprint import pprint
+    from rl.dynamic_programming import value_iteration_result
+    from rl.iterate import converged
+    import numpy as np
 
     user_capacity = 2
     user_poisson_lambda = 1.0
@@ -93,15 +103,11 @@ if __name__ == '__main__':
             holding_cost=user_holding_cost,
             stockout_cost=user_stockout_cost
         )
-
+    dp_vf, dp_policy = value_iteration_result(si_mdp, user_gamma)
     state_action_reward_map = si_mdp.get_action_transition_reward_map()
-
     qvf: TabularActionFunctionApprox[InventoryState, int] = {NonTerminal(s): {a: 0} for s, A in state_action_reward_map.items() for a in A.keys()}
     print(qvf)
 
-    iter = 0
-    for q in tabular_mc_glie(si_mdp, qvf, user_gamma):
-        iter += 1
-        if iter == 100:
-            break
-    print(qvf)
+    opt_qvf = converged(tabular_mc_glie(si_mdp, qvf, user_gamma), done=almost_equal_qvf)
+    mc_opt_policy = greedy_policy_from_tabular_qvf(opt_qvf, si_mdp.actions)
+    print(mc_opt_policy)
